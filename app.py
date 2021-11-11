@@ -14,7 +14,7 @@ def index():
     name = session.get("name")
     if name == None:
         name = "[pls login]"
-    return render_template("index.html", name=name, users=users.find())
+    return render_template("index.html", name=name)
     
 @app.route('/login')
 def login():
@@ -36,11 +36,11 @@ def login_form():
         return redirect(url_for("login"))
 
 @app.route('/signup')
-def signin():
+def signup():
     return render_template("signup.html")
 
 @app.route('/signup', methods=['POST'])
-def signin_form():
+def signup_form():
     username = request.form.get("username")
     password = request.form.get("password")
     name = request.form.get("name")
@@ -57,6 +57,10 @@ def signin_form():
     users.insert(user)
 
     return redirect(url_for("index"))
+
+@app.route('/admin')
+def admin():
+    return render_template("admin.html", users=users.find())
 
 if __name__ == "__main__":
     app.run(debug=True)

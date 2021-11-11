@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>This is admin</h1>
+
+<div class="container">
+    <h1>Users</h1>
+    <table class="table">
+    
+        <thead>
+            <th>#</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>name</th>
+        </thead>
+    
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <th scope="row">{{user._id}}</th>    
+                    <td>{{user.username}}</td>
+                    <td>{{user.password}}</td>
+                    <td>{{user.name}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    
+    </table>
+</div>
+
+{% endblock content %}
