@@ -1,4 +1,5 @@
-from flask import Flask, render_template, url_for, redirect, session, request
+from flask import Flask, render_template, url_for, redirect, session, request, get_flashed_messages
+from flask.helpers import flash
 from pymongo import MongoClient
 import datetime
 
@@ -12,10 +13,22 @@ users = db.users
 @app.route('/')
 def index():
     name = session.get("name")
-    if name == None:
-        name = "[pls login]"
     return render_template("index.html", name=name)
-    
+
+@app.route('/profile')
+def profile():
+    name = session.get("name")
+    if name != None:
+        return render_template("profile.html")
+    else:
+        return redirect(url_for("login"))
+
+@app.route('/logout')
+def logout():
+    session["name"] = None
+    session["username"] = None
+    return redirect(url_for("login"))
+
 @app.route('/login')
 def login():
     return render_template("login.html")
@@ -33,6 +46,7 @@ def login_form():
         return redirect(url_for("index"))
     else:
         print("Not Found")
+        flash("User Not Found")
         return redirect(url_for("login"))
 
 @app.route('/signup')
