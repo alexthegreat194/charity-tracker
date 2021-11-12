@@ -1,17 +1,18 @@
-from flask import Flask, render_template, url_for, redirect, session, request, get_flashed_messages
-from flask.helpers import flash
+from flask import Flask, render_template, url_for, redirect, session, request, get_flashed_messages, flash
+from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 import datetime
 
 '''
 TODO:
-hash passwords
-set sessions to username and password
 set up signup checking user avaliability
 '''
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super secret key' #this is for the sessions
+
+bcrypt = Bcrypt(app)
 
 client = MongoClient()
 db = client.Charity_Tracker
@@ -34,6 +35,7 @@ def profile():
 def logout():
     session["name"] = None
     session["username"] = None
+    session["password"] = None
     return redirect(url_for("login"))
 
 @app.route('/login')
@@ -44,13 +46,19 @@ def login():
 def login_form():
     username = request.form.get("username")
     password = request.form.get("password")
+    #password_hash = bcrypt.generate_password_hash(password)
     
-    found_user = users.find_one({"username": username, "password": password})
+    found_user = users.find_one({"username": username})
     if found_user:
         print("Found")
-        session["name"] = found_user['name']
-        session["username"] = found_user['username']
-        return redirect(url_for("index"))
+        if bcrypt.check_password_hash(found_user['password'], password):
+            session["name"] = found_user['name']
+            session["username"] = found_user['username']
+            session["password"] = found_user['password']
+            return redirect(url_for("index"))
+        else:
+            flash("Incorrect Password")
+            return redirect(url_for("login")) 
     else:
         print("Not Found")
         flash("User Not Found")
@@ -64,18 +72,25 @@ def signup():
 def signup_form():
     username = request.form.get("username")
     password = request.form.get("password")
+    password_hash = bcrypt.generate_password_hash(password)
     name = request.form.get("name")
 
-    session["name"] = name
-    session["username"] = username
-
+    found_user = users.find_one({'username':username})
+    if found_user:
+        flash("User already exists")
+        return redirect(url_for('signup'))
+    
     user = {
         'username':username,
-        'password':password,
+        'password':password_hash,
         'name':name,
         'created':datetime.datetime.utcnow()
     }
     users.insert(user)
+
+    session["name"] = user['name']
+    session["username"] = user['username']
+    session["password"] = user['password']
 
     return redirect(url_for("index"))
 
