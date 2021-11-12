@@ -3,6 +3,13 @@ from flask.helpers import flash
 from pymongo import MongoClient
 import datetime
 
+'''
+TODO:
+hash passwords
+set sessions to username and password
+set up signup checking user avaliability
+'''
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super secret key' #this is for the sessions
 
