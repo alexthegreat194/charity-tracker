@@ -6,7 +6,9 @@ import datetime
 
 '''
 TODO:
-set up signup checking user avaliability
+
+profile page 
+log donation on profile page 
 '''
 
 app = Flask(__name__)
@@ -17,6 +19,7 @@ bcrypt = Bcrypt(app)
 client = MongoClient()
 db = client.Charity_Tracker
 users = db.users
+charities = db.charities
 
 @app.route('/')
 def index():
@@ -96,7 +99,28 @@ def signup_form():
 
 @app.route('/admin')
 def admin():
-    return render_template("admin.html", users=users.find())
+    username = session.get('username')
+    print(f'{username} tried to access admin...')
+    if username != None:
+        if username == 'admin':
+            return render_template("admin.html", users=users.find(), charities=charities.find())
+        else:
+            return render_template("profile.html")
+    else:
+        return redirect(url_for("login"))
+
+@app.route('/admin', methods=['POST'])
+def admin_form():
+    
+    charity = {
+        'name':request.form.get('name'),
+        'description':request.form.get('description'),
+        'created':datetime.datetime.utcnow()
+    }
+    print(charity)
+    charities.insert_one(charity)
+
+    return redirect(url_for('admin'))
 
 if __name__ == "__main__":
     app.run(debug=True)
