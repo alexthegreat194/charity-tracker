@@ -6,9 +6,10 @@ import datetime
 
 '''
 TODO:
-
+show all charities on main page 
 profile page 
 log donation on profile page 
+charity page for individual charities
 '''
 
 app = Flask(__name__)
