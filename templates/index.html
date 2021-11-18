@@ -1,15 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if name == None %}
-    <h1>Pls login</h1>
-    {% else %}
-    <h1>Hello {{name}}</h1>
-    {% endif %}
+    <div class="container jumbotron">
+        {% if name == None %}
+        <h1>Pls login</h1>
+        {% else %}
+        <h1>Hello {{name}}</h1>
+        {% endif %}
+    </div>
     
-    {% for user in users %}
-        <h1>name: {{ user.name }}</h1>
-        <h4>username: {{ user.username }} </h4>
-    {% endfor %}
+    <div class="row container mx-md-n5 m-auto">
+        {% for charity in charities %}
+            <div class="card col-lg-4 col-md-5 col-sm-10">
+                <div class="card-body">
+                    <h4 class="card-title">{{ charity.name }}</h4>
+                    <p class="card-text">{{ charity.description }}</p>
+                    <a href="charity/{{ charity._id }}"><button type="button" class="btn btn-primary">View</button></a>
+                </div>
+            </div>   
+        {% endfor %}
+        
+    </div>
 
 {% endblock content %}

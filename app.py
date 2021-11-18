@@ -6,10 +6,9 @@ import datetime
 
 '''
 TODO:
-show all charities on main page 
+charity page for individual charities
 profile page 
 log donation on profile page 
-charity page for individual charities
 '''
 
 app = Flask(__name__)
@@ -25,7 +24,7 @@ charities = db.charities
 @app.route('/')
 def index():
     name = session.get("name")
-    return render_template("index.html", name=name)
+    return render_template("index.html", name=name, charities=charities.find())
 
 @app.route('/profile')
 def profile():
