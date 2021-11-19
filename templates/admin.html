@@ -70,4 +70,29 @@
     </form>
 </div>
 
+<div class="container">
+    <h1>Donations</h1>
+    <table class="table">
+    
+        <thead>
+            <th>#</th>
+            <th>Amount</th>
+            <th>Donator</th>
+            <th>Charity</th>
+        </thead>
+    
+        <tbody>
+            {% for donation in donations %}
+                <tr>
+                    <th scope="row">{{donation._id}}</th>    
+                    <td>{{donation.amount}}</td>
+                    <td>{{donation.donator_id}}</td>
+                    <td>{{donation.charity_id}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    
+    </table>
+</div>
+
 {% endblock content %}

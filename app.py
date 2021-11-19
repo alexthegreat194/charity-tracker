@@ -4,11 +4,12 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import datetime
 
+import pymongo
+
 '''
 TODO:
 charity page for individual charities
-profile page 
-log donation on profile page 
+
 '''
 
 app = Flask(__name__)
@@ -20,26 +21,48 @@ client = MongoClient()
 db = client.Charity_Tracker
 users = db.users
 charities = db.charities
+donations = db.donations
 
 @app.route('/')
 def index():
-    name = session.get("name")
-    return render_template("index.html", name=name, charities=charities.find())
+    return render_template("index.html", charities=charities.find())
+
 
 @app.route('/profile')
 def profile():
-    name = session.get("name")
-    if name != None:
-        return render_template("profile.html")
+    username = session.get("username")
+    if username != None:
+        user = users.find_one({'username':session.get('username')})
+        charities_list = charities.find().sort('name', pymongo.ASCENDING)
+        print(user)
+        user_donations = donations.find({'donator_id':user['_id']})
+        return render_template("profile.html", user=user, charities=charities_list, donations=user_donations)
     else:
         return redirect(url_for("login"))
 
+@app.route('/profile', methods=['POST'])
+def profile_form():
+    charity_id = request.form.get('chosen-charity')
+    money = request.form.get('money')
+    user = users.find_one({'username':session.get('username')})
+
+    donation = {
+        'amount':float(money),
+        'donator_id':user['_id'],
+        'charity_id':charity_id,
+        'created':datetime.datetime.utcnow()
+    }
+    donations.insert_one(donation)
+
+    return redirect(url_for('profile'))
+
+
 @app.route('/logout')
 def logout():
-    session["name"] = None
     session["username"] = None
     session["password"] = None
     return redirect(url_for("login"))
+
 
 @app.route('/login')
 def login():
@@ -53,12 +76,16 @@ def login_form():
     
     found_user = users.find_one({"username": username})
     if found_user:
-        print("Found")
+        print("Found user")
+        print(found_user)
+
+
         if bcrypt.check_password_hash(found_user['password'], password):
-            session["name"] = found_user['name']
+            print("Logged in")
             session["username"] = found_user['username']
             session["password"] = found_user['password']
             return redirect(url_for("index"))
+
         else:
             flash("Incorrect Password")
             return redirect(url_for("login")) 
@@ -66,6 +93,7 @@ def login_form():
         print("Not Found")
         flash("User Not Found")
         return redirect(url_for("login"))
+
 
 @app.route('/signup')
 def signup():
@@ -91,11 +119,11 @@ def signup_form():
     }
     users.insert(user)
 
-    session["name"] = user['name']
     session["username"] = user['username']
     session["password"] = user['password']
 
     return redirect(url_for("index"))
+
 
 @app.route('/admin')
 def admin():
@@ -103,7 +131,7 @@ def admin():
     print(f'{username} tried to access admin...')
     if username != None:
         if username == 'admin':
-            return render_template("admin.html", users=users.find(), charities=charities.find())
+            return render_template("admin.html", users=users.find(), charities=charities.find(), donations=donations.find())
         else:
             return render_template("profile.html")
     else:
@@ -121,6 +149,18 @@ def admin_form():
     charities.insert_one(charity)
 
     return redirect(url_for('admin'))
+
+
+@app.route('/charity/<id>')
+def charity(id):
+    charity = charities.find_one({'_id':ObjectId(id)})
+    if charity:
+        found_donations = donations.find({'charity_id':charity['_id']})
+        print(found_donations)
+        return render_template('charity.html', charity=charity, donations=found_donations)
+    else:
+        return redirect(url_for('index'))
+
 
 if __name__ == "__main__":
     app.run(debug=True)

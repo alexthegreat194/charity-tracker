@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ charity.name }}</h1>
+<h5>{{ charity.description }}</h5>
+<a href="{{ url_for('index') }}">
+    <button type="button" class="btn btn-primary">Back</button>
+</a>
+
+<div class="container">
+    <h1>Donations</h1>
+    <table class="table">
+    
+        <thead>
+            <th>#</th>
+            <th>Amount</th>
+            <th>Donator</th>
+            <th>Charity</th>
+        </thead>
+    
+        <tbody>
+            {% for donation in donations %}
+                <tr>
+                    <th scope="row">{{donation._id}}</th>    
+                    <td>{{donation.amount}}</td>
+                    <td>{{donation.donator_id}}</td>
+                    <td>{{donation.charity_id}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    
+    </table>
+</div>
+
+{% endblock content %}
