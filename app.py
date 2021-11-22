@@ -170,7 +170,21 @@ def charity(id):
     charity = charities.find_one({'_id':ObjectId(id)})
     if charity:
         found_donations = donations.find({'charity_id':charity['_id']})
-        return render_template('charity.html', charity=charity, donations=found_donations)
+        
+        new_list = []
+        index = 0
+        for donation in found_donations:
+            print(donation)
+            index += 1
+            user = users.find_one({'_id':donation['donator_id']})
+            print(user)
+            donation = {
+                'index':index,
+                'amount':donation['amount'],
+                'name':user['name']
+            }
+            new_list.append(donation)
+        return render_template('charity.html', charity=charity, donations=new_list)
     else:
         return redirect(url_for('index'))
 

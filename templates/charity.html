@@ -22,16 +22,14 @@
             <th>#</th>
             <th>Amount</th>
             <th>Donator</th>
-            <th>Charity</th>
         </thead>
     
         <tbody>
             {% for donation in donations %}
                 <tr>
-                    <th scope="row">{{donation._id}}</th>    
+                    <th scope="row">{{donation.index}}</th>    
                     <td>{{donation.amount}}</td>
-                    <td>{{donation.donator_id}}</td>
-                    <td>{{donation.charity_id}}</td>
+                    <td>{{donation.name}}</td>
                 </tr>
             {% endfor %}
         </tbody>
