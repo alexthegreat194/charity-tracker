@@ -2,11 +2,17 @@
 
 {% block content %}
 
-<h1>{{ charity.name }}</h1>
-<h5>{{ charity.description }}</h5>
-<a href="{{ url_for('index') }}">
-    <button type="button" class="btn btn-primary">Back</button>
-</a>
+<div class="bg-light p-5 rounded-lg m-3">
+    <h1 class="display-3">{{ charity.name }}</h1>
+    <h5 class="lead">{{ charity.description }}</h5>
+    <hr>
+    <a href="{{ url_for('index') }}">
+        <button type="button" class="btn btn-primary">Back</button>
+    </a>
+    <a href="{{ url_for('profile') }}">
+        <button type="button" class="btn btn-primary">Log Donation</button>
+    </a>
+</div>
 
 <div class="container">
     <h1>Donations</h1>
