@@ -8,8 +8,7 @@ import pymongo
 
 '''
 TODO:
-charity page for individual charities
-
+make things look good
 '''
 
 app = Flask(__name__)
@@ -31,12 +30,25 @@ def index():
 @app.route('/profile')
 def profile():
     username = session.get("username")
-    if username != None:
+    if username:
         user = users.find_one({'username':session.get('username')})
         charities_list = charities.find().sort('name', pymongo.ASCENDING)
-        print(user)
         user_donations = donations.find({'donator_id':user['_id']})
-        return render_template("profile.html", user=user, charities=charities_list, donations=user_donations)
+
+        new_list = []
+        index = 0
+        for donation in user_donations:
+            index += 1
+            charity = charities.find_one({'_id':donation['charity_id']})
+            donation = {
+                'index':index,
+                'amount':donation['amount'],
+                'charity_name':charity['name'],
+                'charity_id':charity['_id']
+            }
+            new_list.append(donation)
+
+        return render_template("profile.html", user=user, charities=charities_list, donations=new_list)
     else:
         return redirect(url_for("login"))
 
@@ -49,7 +61,7 @@ def profile_form():
     donation = {
         'amount':float(money),
         'donator_id':user['_id'],
-        'charity_id':charity_id,
+        'charity_id':ObjectId(charity_id),
         'created':datetime.datetime.utcnow()
     }
     donations.insert_one(donation)
@@ -156,7 +168,6 @@ def charity(id):
     charity = charities.find_one({'_id':ObjectId(id)})
     if charity:
         found_donations = donations.find({'charity_id':charity['_id']})
-        print(found_donations)
         return render_template('charity.html', charity=charity, donations=found_donations)
     else:
         return redirect(url_for('index'))

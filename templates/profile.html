@@ -2,8 +2,13 @@
 
 {% block content %}
 
-    <h1>Hello {{ user.name }}</h1>
-    <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Log out</button></a>
+    <div class="bg-light p-5 rounded-lg m-3">
+        <h1 class="display-3">Hello {{ user.name }}</h1>
+        <hr>
+        <a href="{{ url_for('logout') }}"><button class="btn btn-primary">Log out</button></a>
+    </div>
+
+    <br>
 
     <div class="container">
         <h1>Donations Made</h1>
@@ -12,17 +17,15 @@
             <thead>
                 <th>#</th>
                 <th>Amount</th>
-                <th>Donator</th>
                 <th>Charity</th>
             </thead>
         
             <tbody>
                 {% for donation in donations %}
                     <tr>
-                        <th scope="row">{{donation._id}}</th>    
+                        <th scope="row">{{donation.index}}</th>    
                         <td>{{donation.amount}}</td>
-                        <td>{{donation.donator_id}}</td>
-                        <td>{{donation.charity_id}}</td>
+                        <td><a href="charity/{{ donation.charity_id }}">{{donation.charity_name}}</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -30,26 +33,31 @@
         </table>
     </div>
 
-    <form action="" method="post">
+    <br>
 
-        <div class="form-group">
-            <label for="chosen-charity">Charity</label>
-            <select name="chosen-charity" id="chosen-charity">
-                {% for charity in charities %}
-                    <option value="{{ charity._id }}">{{ charity.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="money">Money</label>
-            <input type="number" name="money" id="money">
-        </div>
-
-        <div class="form-group">
-            <input type="submit" value="Donate">
-        </div>
-
-    </form>
+    <div id="log" class="p-3 m-5">
+        <h3>Log Donation</h3>
+        <form action="" method="post" class="">
+    
+            <div class="form-group p-2">
+                <label for="chosen-charity">Charity</label>
+                <select class="form-control" name="chosen-charity" id="chosen-charity">
+                    {% for charity in charities %}
+                        <option value="{{ charity._id }}">{{ charity.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group p-2">
+                <label for="money">Money</label>
+                <input class="form-control" type="number" name="money" id="money">
+            </div>
+    
+            <div class="form-group p-2">
+                <input class="btn btn-primary" type="submit" value="Donate">
+            </div>
+    
+        </form>
+    </div>
 
 {% endblock content %}
