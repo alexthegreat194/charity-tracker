@@ -5,6 +5,7 @@ from bson.objectid import ObjectId
 import datetime
 
 import pymongo
+import os
 
 '''
 TODO:
@@ -16,7 +17,9 @@ app.config['SECRET_KEY'] = 'super secret key' #this is for the sessions
 
 bcrypt = Bcrypt(app)
 
-client = MongoClient()
+username = os.environ.get('USERNAME')
+password = os.environ.get('PASSWORD')
+client = MongoClient(f'mongodb+srv://{username}:{password}@cluster0.2lvxa.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.Charity_Tracker
 users = db.users
 charities = db.charities
@@ -29,9 +32,8 @@ def index():
 
 @app.route('/profile')
 def profile():
-    username = session.get("username")
-    if username:
-        user = users.find_one({'username':session.get('username')})
+    user = users.find_one( {'username':session.get('username'), 'password':session.get('password')} )
+    if user:
         charities_list = charities.find().sort('name', pymongo.ASCENDING)
         user_donations = donations.find({'donator_id':user['_id']})
 
@@ -139,10 +141,10 @@ def signup_form():
 
 @app.route('/admin')
 def admin():
-    username = session.get('username')
+    user = users.find_one( {'username':session.get('username'), 'password':session.get('password')} )
     print(f'{username} tried to access admin...')
-    if username != None:
-        if username == 'admin':
+    if user:
+        if user['username'] == 'admin':
             return render_template("admin.html", users=users.find(), charities=charities.find(), donations=donations.find())
         else:
             return render_template("profile.html")
